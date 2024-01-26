@@ -25,6 +25,21 @@ const MatchController = {
         },
       }));
 
+      // Validasi for each club is homeClub or awayClub only for once per match.
+      const clubIds = matchesData.reduce(
+        (ids, match) => [...ids, match.clubHome, match.clubAway],
+        []
+      );
+      const uniqueClubIds = [...new Set(clubIds)];
+
+      if (clubIds.length !== uniqueClubIds.length) {
+        return res.status(400).json({
+          status: "error",
+          success: false,
+          message: "Each club can only be homeClub or awayClub once per match.",
+        });
+      }
+
       const createdMatches = await models.MatchDB.create(matchesData);
 
       // Looping for updating club stats based on match results
