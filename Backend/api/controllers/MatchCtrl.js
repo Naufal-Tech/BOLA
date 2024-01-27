@@ -25,18 +25,19 @@ const MatchController = {
         },
       }));
 
-      // Validasi for each club is homeClub or awayClub only for once per match.
-      const clubIds = matchesData.reduce(
-        (ids, match) => [...ids, match.clubHome, match.clubAway],
-        []
-      );
-      const uniqueClubIds = [...new Set(clubIds)];
+      // Check if there are existing matches with the same clubHome, clubAway, and opponent
+      const existingMatches = await models.MatchDB.find({
+        $or: matchesData.map((match) => ({
+          $and: [{ clubHome: match.clubHome }, { clubAway: match.clubAway }],
+        })),
+      });
 
-      if (clubIds.length !== uniqueClubIds.length) {
+      if (existingMatches.length > 0) {
         return res.status(400).json({
           status: "error",
           success: false,
-          message: "Each club can only be homeClub or awayClub once per match.",
+          message:
+            "Matches with the same clubHome, clubAway, and opponent already exist",
         });
       }
 

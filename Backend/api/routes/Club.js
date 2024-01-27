@@ -13,12 +13,15 @@ const apiLimiter = rateLimiter({
 // Pakai Express Router
 const clubRouter = express.Router();
 
-//POST: /api/v1/club/register
+//POST: /api/v1/club
 clubRouter.post(
   "/",
   upload.single("img_club"),
   validateClub,
   Controller.create
 );
+
+//GET: /api/v1/club
+clubRouter.get("/", Controller.get);
 
 export default clubRouter;
